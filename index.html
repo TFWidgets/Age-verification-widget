@@ -1,1 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Age Verification Widget Demo</title>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1 { color: #1f2937; margin-bottom: 20px; }
+        .demo-section { margin: 30px 0; padding: 20px; background: #f9fafb; border-radius: 12px; }
+        .demo-button { 
+            background: #3b82f6; color: white; border: none; padding: 12px 24px; 
+            border-radius: 8px; cursor: pointer; font-weight: 600; margin: 5px;
+        }
+        .demo-button:hover { background: #2563eb; }
+        pre { background: #1f2937; color: #e5e7eb; padding: 20px; border-radius: 8px; overflow-x: auto; }
+    </style>
+    
+    <!-- Local configuration for demo -->
+    <script type="application/json" id="bhw-age-local-config">
+    {
+        "title": "Age Verification",
+        "subtitle": "Adults Only",
+        "message": "You must be 18+ to view this content. Please verify your age.",
+        "yesButtonText": "I'm 18+",
+        "noButtonText": "I'm under 18",
+        "frequency": "session",
+        "showDelay": 500,
+        "style": {
+            "colors": {
+                "headerBackground": "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)"
+            }
+        }
+    }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>🔞 Age Verification Widget Demo</h1>
+        
+        <div class="demo-section">
+            <h2>Features</h2>
+            <ul>
+                <li>✅ Customizable design and messages</li>
+                <li>✅ Remember user choice (configurable duration)</li>
+                <li>✅ Redirect on decline</li>
+                <li>✅ Content blocking option</li>
+                <li>✅ Mobile responsive</li>
+                <li>✅ Accessibility support</li>
+                <li>✅ Local & remote configuration</li>
+                <li>✅ Integration with bhw ecosystem</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h2>Test Widget</h2>
+            <button class="demo-button" onclick="showAgeWidget()">Show Age Verification</button>
+            <button class="demo-button" onclick="clearStorage()">Clear Remembered Choice</button>
+        </div>
+
+        <div class="demo-section">
+            <h2>Usage</h2>
+            <h3>Basic Implementation:</h3>
+            <pre><code>&lt;script src="https://your-domain.com/embed.js" data-id="demo"&gt;&lt;/script&gt;</code></pre>
+            
+            <h3>With Local Config:</h3>
+            <pre><code>&lt;script type="application/json" id="bhw-age-local-config"&gt;
+{
+    "title": "Age Verification",
+    "message": "You must be 18+ to continue",
+    "frequency": "30d"
+}
+&lt;/script&gt;
+&lt;script src="https://your-domain.com/embed.js" data-id="local"&gt;&lt;/script&gt;</code></pre>
+        </div>
+
+        <div class="demo-section">
+            <h2>Configuration Options</h2>
+            <ul>
+                <li><strong>title</strong> - Main title text</li>
+                <li><strong>subtitle</strong> - Subtitle text</li>
+                <li><strong>message</strong> - Main message body</li>
+                <li><strong>frequency</strong> - How often to show: 'always', 'session', '24h', '30d'</li>
+                <li><strong>redirectUrl</strong> - Where to redirect on decline</li>
+                <li><strong>blockContent</strong> - Block page scrolling until verified</li>
+                <li><strong>showDelay</strong> - Delay before showing (ms)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Age Verification Widget -->
+    <script src="./embed.js" data-id="local"></script>
+
+    <script>
+        function showAgeWidget() {
+            const widget = window.BusinessHoursWidgets?.ageVerification?.local;
+            if (widget) {
+                widget.show();
+            }
+        }
+        
+        function clearStorage() {
+            localStorage.removeItem('bhw-age-accepted-local');
+            sessionStorage.removeItem('bhw-age-accepted-local');
+            alert('Remembered choice cleared!');
+        }
+    </script>
+</body>
+</html>
 
