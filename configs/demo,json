@@ -6,18 +6,48 @@
     "yesButtonText": "Yes, I'm 18 or older",
     "noButtonText": "No, take me away",
     "iconHtml": "&#128286;",
-    "showDelay": 1000,
-    "frequency": "7d",
     "redirectUrl": "https://www.google.com",
     "blockContent": true,
+    "frequency": "session",
+    "triggers": {
+        "showOnLoad": false,
+        "showDelay": 0,
+        "showOnExit": false,
+        "showOnScroll": 0
+    },
     "style": {
+        "fontFamily": "'Inter', system-ui, sans-serif",
+        "valueFontFamily": "'Inter', system-ui, sans-serif",
         "colors": {
+            "background": "#ffffff",
+            "overlay": "rgba(0,0,0,0.85)",
             "headerBackground": "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)",
-            "btnYes": "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+            "text": "white",
+            "contentText": "#333333",
+            "messageText": "#555555",
+            "footerText": "#9ca3af",
+            "btnYes": "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+            "btnYesText": "white",
+            "btnNo": "#f1f5f9",
+            "btnNoText": "#64748b",
+            "btnNoHover": "#e2e8f0"
+        },
+        "borderRadius": {
+            "widget": 20,
+            "buttons": 12
         },
         "sizes": {
-            "fontSize": 1.0
+            "fontSize": 1.0,
+            "padding": 32,
+            "contentPadding": 32,
+            "footerPadding": 20,
+            "gap": 12,
+            "iconSize": 56
+        },
+        "shadow": {
+            "widget": "0 25px 70px rgba(0,0,0,0.4)",
+            "text": "0 2px 8px rgba(0,0,0,0.3)",
+            "btnYesHover": "0 8px 24px rgba(16, 185, 129, 0.4)"
         }
     }
 }
-
