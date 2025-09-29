@@ -1,1 +1,636 @@
+(function() {
+    'use strict';
+
+    const inlineCSS = `
+        .bhw-age-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bhw-overlay, rgba(0,0,0,0.85));
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            backdrop-filter: blur(8px);
+            font-family: var(--bhw-font, 'Inter', system-ui, sans-serif);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .bhw-age-overlay.show {
+            opacity: 1;
+        }
+        
+        .bhw-age-card {
+            width: min(90vw, 420px);
+            background: var(--bhw-bg, #ffffff);
+            border-radius: var(--bhw-widget-radius, 20px);
+            box-shadow: var(--bhw-shadow, 0 25px 70px rgba(0,0,0,0.4));
+            position: relative;
+            overflow: hidden;
+            transform: scale(0.85) translateY(30px);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .bhw-age-overlay.show .bhw-age-card {
+            transform: scale(1) translateY(0);
+        }
+        
+        .bhw-age-header {
+            background: var(--bhw-header-bg, linear-gradient(135deg, #dc2626 0%, #991b1b 100%));
+            padding: var(--bhw-padding, 32px 28px);
+            text-align: center;
+            color: var(--bhw-text-color, white);
+            position: relative;
+        }
+        
+        .bhw-age-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--bhw-overlay-inner, 
+                radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)
+            );
+            pointer-events: none;
+        }
+        
+        .bhw-age-icon {
+            font-size: var(--bhw-icon-size, 3.5em);
+            margin-bottom: 12px;
+            display: block;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            position: relative;
+            z-index: 1;
+        }
+        
+        .bhw-age-title {
+            font-size: var(--bhw-title-size, 1.8em);
+            font-weight: var(--bhw-title-weight, 800);
+            margin: 0 0 8px 0;
+            text-shadow: var(--bhw-text-shadow, 0 2px 8px rgba(0,0,0,0.3));
+            letter-spacing: var(--bhw-title-spacing, -0.2px);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .bhw-age-subtitle {
+            font-size: var(--bhw-subtitle-size, 1.05em);
+            opacity: var(--bhw-subtitle-opacity, 0.9);
+            font-weight: var(--bhw-subtitle-weight, 500);
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .bhw-age-content {
+            padding: var(--bhw-content-padding, 32px 28px);
+            text-align: center;
+            color: var(--bhw-content-text-color, #333333);
+        }
+        
+        .bhw-age-message {
+            font-size: var(--bhw-message-size, 1.1em);
+            line-height: 1.5;
+            margin: 0 0 28px 0;
+            color: var(--bhw-message-color, #555555);
+        }
+        
+        .bhw-age-buttons {
+            display: flex;
+            gap: var(--bhw-gap, 12px);
+            flex-direction: column;
+        }
+        
+        .bhw-age-btn {
+            padding: var(--bhw-btn-padding, 16px 24px);
+            border-radius: var(--bhw-btn-radius, 12px);
+            font-size: var(--bhw-btn-size, 1.1em);
+            font-weight: var(--bhw-btn-weight, 700);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            font-family: var(--bhw-btn-font, inherit);
+        }
+        
+        .bhw-age-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .bhw-age-btn-yes {
+            background: var(--bhw-btn-yes-bg, linear-gradient(135deg, #10b981 0%, #059669 100%));
+            color: var(--bhw-btn-yes-color, white);
+            order: 1;
+        }
+        
+        .bhw-age-btn-yes:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--bhw-btn-yes-shadow, 0 8px 24px rgba(16, 185, 129, 0.4));
+        }
+        
+        .bhw-age-btn-no {
+            background: var(--bhw-btn-no-bg, #f1f5f9);
+            color: var(--bhw-btn-no-color, #64748b);
+            order: 2;
+        }
+        
+        .bhw-age-btn-no:hover {
+            background: var(--bhw-btn-no-bg-hover, #e2e8f0);
+            transform: translateY(-1px);
+        }
+        
+        .bhw-age-footer {
+            padding: var(--bhw-footer-padding, 20px 28px 28px);
+            text-align: center;
+            font-size: var(--bhw-footer-size, 0.85em);
+            color: var(--bhw-footer-color, #9ca3af);
+            border-top: 1px solid #f1f5f9;
+        }
+        
+        .bhw-age-loading {
+            text-align: center;
+            padding: var(--bhw-loading-padding, 40px);
+            color: var(--bhw-loading-color, #666);
+        }
+        
+        .bhw-age-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(220,38,38,0.2);
+            border-top: 3px solid #dc2626;
+            border-radius: 50%;
+            animation: bhw-age-spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes bhw-age-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 480px) {
+            .bhw-age-card {
+                width: min(95vw, 380px);
+            }
+            .bhw-age-header {
+                padding: var(--bhw-padding-mobile, 28px 24px);
+            }
+            .bhw-age-content {
+                padding: var(--bhw-content-padding-mobile, 28px 24px);
+            }
+            .bhw-age-title {
+                font-size: var(--bhw-title-size-mobile, 1.6em);
+            }
+            .bhw-age-message {
+                font-size: var(--bhw-message-size-mobile, 1.05em);
+            }
+            .bhw-age-buttons {
+                gap: var(--bhw-gap-mobile, 10px);
+            }
+        }
+    `;
+
+    window.BusinessHoursWidgets = window.BusinessHoursWidgets || {};
+    window.BusinessHoursWidgets.ageVerification = window.BusinessHoursWidgets.ageVerification || {};
+
+    try {
+        const currentScript = document.currentScript || (function() {
+            const scripts = document.getElementsByTagName('script');
+            return scripts[scripts.length - 1];
+        })();
+
+        let clientId = currentScript.dataset.id;
+        if (!clientId) {
+            console.error('[BusinessHoursAgeVerificationWidget] data-id обязателен');
+            return;
+        }
+
+        clientId = normalizeId(clientId);
+
+        // Защита от повторного выполнения
+        if (currentScript.dataset.bhwMounted === '1') return;
+        currentScript.dataset.bhwMounted = '1';
+
+        console.log(`[BusinessHoursAgeVerificationWidget] 🚀 Инициализация виджета "${clientId}"`);
+
+        if (!document.querySelector('#business-hours-age-verification-widget-styles')) {
+            const style = document.createElement('style');
+            style.id = 'business-hours-age-verification-widget-styles';
+            style.textContent = inlineCSS;
+            document.head.appendChild(style);
+        }
+
+        const baseUrl = getBasePath(currentScript.src);
+        const uniqueClass = `bhw-age-${clientId}-${Date.now()}`;
+        
+        console.log(`[BusinessHoursAgeVerificationWidget] 📋 Загружаем конфиг для "${clientId}"`);
+
+        // Загружаем конфигурацию
+        loadConfig(clientId, baseUrl)
+            .then(fetchedConfig => {
+                const finalConfig = mergeDeep(getDefaultConfig(), fetchedConfig);
+                console.log(`[BusinessHoursAgeVerificationWidget] 📋 Финальный конфиг для "${clientId}":`, finalConfig);
+                
+                const widget = createAgeVerificationWidget(finalConfig, uniqueClass, clientId);
+                window.BusinessHoursWidgets.ageVerification[clientId] = widget;
+                
+                // Показываем виджет согласно настройкам
+                if (shouldShowWidget(widget, finalConfig)) {
+                    setTimeout(() => widget.show(), finalConfig.showDelay || 500);
+                }
+                
+                console.log(`[BusinessHoursAgeVerificationWidget] ✅ Виджет "${clientId}" успешно создан`);
+            })
+            .catch(error => {
+                console.warn(`[BusinessHoursAgeVerificationWidget] ⚠️ Ошибка загрузки "${clientId}":`, error.message);
+                const defaultConfig = getDefaultConfig();
+                const widget = createAgeVerificationWidget(defaultConfig, uniqueClass, clientId);
+                window.BusinessHoursWidgets.ageVerification[clientId] = widget;
+                
+                if (shouldShowWidget(widget, defaultConfig)) {
+                    setTimeout(() => widget.show(), defaultConfig.showDelay || 500);
+                }
+            });
+
+    } catch (error) {
+        console.error('[BusinessHoursAgeVerificationWidget] 💥 Критическая ошибка:', error);
+    }
+
+    function normalizeId(id) {
+        return (id || 'demo').replace(/\.(json|js)$/i, '');
+    }
+
+    function getBasePath(src) {
+        if (!src) return './';
+        try {
+            const url = new URL(src, location.href);
+            return url.origin + url.pathname.replace(/\/[^\/]*$/, '/');
+        } catch (error) {
+            return './';
+        }
+    }
+
+    function getDefaultConfig() {
+        return {
+            title: "Age Verification",
+            subtitle: "Restricted Content",
+            message: "You must be 18 or older to view this content. Please confirm your age to continue.",
+            footerText: "By clicking 'Yes', you confirm that you are of legal age.",
+            yesButtonText: "Yes, I'm 18+",
+            noButtonText: "No, I'm under 18",
+            icon: "",
+            iconHtml: "&#128286;", // 🔞 как HTML entity
+            showDelay: 500,
+            frequency: "30d", // 'always' | 'session' | '24h' | '30d'
+            redirectUrl: "https://www.google.com",
+            blockContent: true,
+            style: {
+                fontFamily: "'Inter', system-ui, sans-serif",
+                valueFontFamily: "'Inter', system-ui, sans-serif",
+                colors: {
+                    background: "#ffffff",
+                    overlay: "rgba(0,0,0,0.85)",
+                    headerBackground: "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)",
+                    text: "white",
+                    contentText: "#333333",
+                    messageText: "#555555",
+                    footerText: "#9ca3af",
+                    btnYes: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                    btnYesText: "white",
+                    btnNo: "#f1f5f9",
+                    btnNoText: "#64748b",
+                    btnNoHover: "#e2e8f0"
+                },
+                borderRadius: {
+                    widget: 20,
+                    buttons: 12
+                },
+                sizes: {
+                    fontSize: 1.0,
+                    padding: 32,
+                    contentPadding: 32,
+                    footerPadding: 20,
+                    gap: 12,
+                    iconSize: 56
+                },
+                shadow: {
+                    widget: "0 25px 70px rgba(0,0,0,0.4)",
+                    text: "0 2px 8px rgba(0,0,0,0.3)",
+                    btnYesHover: "0 8px 24px rgba(16, 185, 129, 0.4)"
+                }
+            }
+        };
+    }
+
+    function mergeDeep(base, override) {
+        const result = { ...base, ...override };
+
+        // Сливаем объекты первого уровня
+        for (const key of ['style']) {
+            if (base[key] && typeof base[key] === 'object' && !Array.isArray(base[key])) {
+                result[key] = { ...(base[key] || {}), ...(override[key] || {}) };
+            }
+        }
+
+        // Сливаем объекты второго уровня в style
+        if (result.style) {
+            for (const subKey of ['colors', 'borderRadius', 'sizes', 'shadow']) {
+                if (base.style[subKey] && typeof base.style[subKey] === 'object' && !Array.isArray(base.style[subKey])) {
+                    result.style[subKey] = { ...(base.style[subKey] || {}), ...(override.style?.[subKey] || {}) };
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    async function loadConfig(clientId, baseUrl) {
+        // Локальный конфиг для разработки
+        if (clientId === 'local') {
+            const localScript = document.querySelector('#bhw-age-local-config');
+            if (!localScript) {
+                throw new Error('Локальный конфиг не найден (#bhw-age-local-config)');
+            }
+            try {
+                const config = JSON.parse(localScript.textContent);
+                console.log(`[BusinessHoursAgeVerificationWidget] 📄 Локальный конфиг загружен:`, config);
+                return config;
+            } catch (err) {
+                throw new Error('Ошибка парсинга локального JSON: ' + err.message);
+            }
+        }
+
+        // Загрузка с сервера
+        const configUrl = `${baseUrl}configs/${encodeURIComponent(clientId)}.json?v=${Date.now()}`;
+        console.log(`[BusinessHoursAgeVerificationWidget] 🌐 Загружаем конфиг: ${configUrl}`);
+        
+        const response = await fetch(configUrl, { 
+            cache: 'no-store',
+            headers: { 'Accept': 'application/json' }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const config = await response.json();
+        console.log(`[BusinessHoursAgeVerificationWidget] ✅ Серверный конфиг загружен:`, config);
+        return config;
+    }
+
+    function createAgeVerificationWidget(config, uniqueClass, id) {
+        const overlay = document.createElement('div');
+        overlay.className = `bhw-age-overlay ${uniqueClass}`;
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(overlay);
+
+        // Применяем кастомные стили
+        applyCustomStyles(uniqueClass, config.style);
+
+        // Безопасное отображение иконки
+        const iconHtml = renderIcon(config);
+
+        // Блокируем контент если включена опция
+        if (config.blockContent) {
+            document.body.style.overflow = 'hidden';
+        }
+
+        // HTML структура
+        overlay.innerHTML = `
+            <div class="bhw-age-card" role="dialog" aria-modal="true" aria-labelledby="age-title">
+                <div class="bhw-age-header">
+                    <div class="bhw-age-icon">${iconHtml}</div>
+                    <h2 class="bhw-age-title" id="age-title">${escapeHtml(config.title)}</h2>
+                    <p class="bhw-age-subtitle">${escapeHtml(config.subtitle)}</p>
+                </div>
+                
+                <div class="bhw-age-content">
+                    <p class="bhw-age-message">${escapeHtml(config.message)}</p>
+                    
+                    <div class="bhw-age-buttons">
+                        <button class="bhw-age-btn bhw-age-btn-yes" type="button" aria-label="Confirm age">
+                            ${escapeHtml(config.yesButtonText)}
+                        </button>
+                        <button class="bhw-age-btn bhw-age-btn-no" type="button" aria-label="Decline verification">
+                            ${escapeHtml(config.noButtonText)}
+                        </button>
+                    </div>
+                </div>
+                
+                ${config.footerText ? `
+                    <div class="bhw-age-footer">
+                        ${escapeHtml(config.footerText)}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+
+        const widget = {
+            overlay,
+            config,
+            id,
+            isShown: false,
+            
+            show() {
+                if (this.isShown) return;
+                
+                this.overlay.style.display = 'flex';
+                setTimeout(() => this.overlay.classList.add('show'), 10);
+                this.overlay.setAttribute('aria-hidden', 'false');
+                
+                this.isShown = true;
+            },
+            
+            hide() {
+                if (!this.isShown) return;
+                
+                this.overlay.classList.remove('show');
+                setTimeout(() => {
+                    this.overlay.style.display = 'none';
+                    if (this.config.blockContent) {
+                        document.body.style.overflow = '';
+                    }
+                }, 400);
+                this.overlay.setAttribute('aria-hidden', 'true');
+                
+                this.isShown = false;
+            },
+            
+            approve() {
+                markAccepted(this.config.frequency, this.id);
+                this.hide();
+            },
+            
+            decline() {
+                if (this.config.redirectUrl) {
+                    window.location.href = this.config.redirectUrl;
+                } else {
+                    this.hide();
+                }
+            }
+        };
+
+        // Обработчики событий
+        setupEventHandlers(widget);
+        
+        return widget;
+    }
+
+    function applyCustomStyles(uniqueClass, style) {
+        const styleId = `bhw-age-style-${uniqueClass}`;
+        let styleElement = document.getElementById(styleId);
+        
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            styleElement.id = styleId;
+            document.head.appendChild(styleElement);
+        }
+        
+        styleElement.textContent = generateUniqueStyles(uniqueClass, style);
+    }
+
+    function generateUniqueStyles(uniqueClass, style) {
+        const s = style || {};
+        const colors = s.colors || {};
+        const sizes = s.sizes || {};
+        const borderRadius = s.borderRadius || {};
+        const shadow = s.shadow || {};
+        const fs = sizes.fontSize || 1;
+
+        return `
+            .${uniqueClass} {
+                --bhw-font: ${s.fontFamily || "'Inter', system-ui, sans-serif"};
+                --bhw-value-font: ${s.valueFontFamily || "'Inter', system-ui, sans-serif"};
+                --bhw-bg: ${colors.background || "#ffffff"};
+                --bhw-overlay: ${colors.overlay || "rgba(0,0,0,0.85)"};
+                --bhw-widget-radius: ${borderRadius.widget || 20}px;
+                --bhw-padding: ${sizes.padding || 32}px 28px;
+                --bhw-padding-mobile: ${Math.round((sizes.padding || 32) * 0.875)}px 24px;
+                --bhw-content-padding: ${sizes.contentPadding || 32}px 28px;
+                --bhw-content-padding-mobile: ${Math.round((sizes.contentPadding || 32) * 0.875)}px 24px;
+                --bhw-footer-padding: ${sizes.footerPadding || 20}px 28px 28px;
+                --bhw-text-color: ${colors.text || "white"};
+                --bhw-content-text-color: ${colors.contentText || "#333333"};
+                --bhw-message-color: ${colors.messageText || "#555555"};
+                --bhw-footer-color: ${colors.footerText || "#9ca3af"};
+                --bhw-header-bg: ${colors.headerBackground || "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)"};
+                --bhw-shadow: ${shadow.widget || "0 25px 70px rgba(0,0,0,0.4)"};
+                --bhw-text-shadow: ${shadow.text || "0 2px 8px rgba(0,0,0,0.3)"};
+                --bhw-icon-size: ${(sizes.iconSize || 56) * fs}px;
+                --bhw-title-size: ${1.8 * fs}em;
+                --bhw-title-size-mobile: ${1.6 * fs}em;
+                --bhw-title-weight: 800;
+                --bhw-title-spacing: -0.2px;
+                --bhw-subtitle-size: ${1.05 * fs}em;
+                --bhw-subtitle-opacity: 0.9;
+                --bhw-subtitle-weight: 500;
+                --bhw-message-size: ${1.1 * fs}em;
+                --bhw-message-size-mobile: ${1.05 * fs}em;
+                --bhw-footer-size: ${0.85 * fs}em;
+                --bhw-gap: ${sizes.gap || 12}px;
+                --bhw-gap-mobile: ${Math.round((sizes.gap || 12) * 0.83)}px;
+                --bhw-btn-padding: ${Math.round(16 * fs)}px ${Math.round(24 * fs)}px;
+                --bhw-btn-radius: ${borderRadius.buttons || 12}px;
+                --bhw-btn-size: ${1.1 * fs}em;
+                --bhw-btn-weight: 700;
+                --bhw-btn-font: inherit;
+                --bhw-btn-yes-bg: ${colors.btnYes || "linear-gradient(135deg, #10b981 0%, #059669 100%)"};
+                --bhw-btn-yes-color: ${colors.btnYesText || "white"};
+                --bhw-btn-yes-shadow: ${shadow.btnYesHover || "0 8px 24px rgba(16, 185, 129, 0.4)"};
+                --bhw-btn-no-bg: ${colors.btnNo || "#f1f5f9"};
+                --bhw-btn-no-color: ${colors.btnNoText || "#64748b"};
+                --bhw-btn-no-bg-hover: ${colors.btnNoHover || "#e2e8f0"};
+                --bhw-loading-padding: 40px;
+                --bhw-loading-color: #666;
+            }
+        `;
+    }
+
+    function renderIcon(config) {
+        // Приоритет: iconHtml > icon > дефолт
+        if (config.iconHtml && config.iconHtml.trim()) {
+            // Если это HTML entity или простой HTML - вставляем как есть
+            if (config.iconHtml.includes('&') || config.iconHtml.includes('<')) {
+                return config.iconHtml;
+            }
+            // Если это эмодзи - экранируем
+            return escapeHtml(config.iconHtml);
+        }
+        
+        if (config.icon && config.icon.trim()) {
+            return escapeHtml(config.icon);
+        }
+        
+        // Дефолтная иконка
+        return '&#128286;'; // 🔞
+    }
+
+    function setupEventHandlers(widget) {
+        const { overlay } = widget;
+        
+        // Кнопка подтверждения возраста
+        overlay.querySelector('.bhw-age-btn-yes').addEventListener('click', () => {
+            widget.approve();
+        });
+        
+        // Кнопка отказа
+        overlay.querySelector('.bhw-age-btn-no').addEventListener('click', () => {
+            widget.decline();
+        });
+        
+        // Блокируем закрытие по Escape и клику на оверлей для обязательной верификации
+        // Если нужно разрешить закрытие, раскомментируйте:
+        /*
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) widget.decline();
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && widget.isShown) {
+                widget.decline();
+            }
+        });
+        */
+    }
+
+    function shouldShowWidget(widget, config) {
+        return shouldShowByFrequency(config.frequency, widget.id);
+    }
+
+    function shouldShowByFrequency(frequency, id) {
+        if (frequency === 'always') return true;
+        
+        if (frequency === 'session') {
+            return !sessionStorage.getItem(`bhw-age-accepted-${id}`);
+        }
+        
+        const lastShown = parseInt(localStorage.getItem(`bhw-age-accepted-${id}`) || '0');
+        const now = Date.now();
+        const intervals = { 
+            '24h': 24 * 60 * 60 * 1000, 
+            '30d': 30 * 24 * 60 * 60 * 1000 
+        };
+        
+        return (now - lastShown) > (intervals[frequency] || intervals['30d']);
+    }
+
+    function markAccepted(frequency, id) {
+        if (frequency === 'session') {
+            sessionStorage.setItem(`bhw-age-accepted-${id}`, '1');
+        } else if (frequency !== 'always') {
+            localStorage.setItem(`bhw-age-accepted-${id}`, Date.now().toString());
+        }
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text || '';
+        return div.innerHTML;
+    }
+})();
 
