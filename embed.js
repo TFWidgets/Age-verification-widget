@@ -1,6 +1,7 @@
 (function() {
     'use strict';
 
+    // Базовые CSS стили с CSS-переменными для полной кастомизации
     const inlineCSS = `
         .bhw-overlay {
             position: fixed;
@@ -341,22 +342,26 @@
         }
     }
 
+    // Применение кастомных стилей с уникальным классом
     function applyCustomStyles(containerObj, config, uniqueClass) {
+        // ИСПРАВЛЕНО: читаем config.style вместо config.styling
         const s = config.style || {};
         
+        // Создаем уникальные стили для этого виджета
         const styleElement = document.createElement('style');
         styleElement.textContent = generateUniqueStyles(uniqueClass, s);
         containerObj.container.appendChild(styleElement);
     }
 
     function generateUniqueStyles(uniqueClass, style) {
-
+        // ИСПРАВЛЕНО: правильно читаем структуру style.colors/sizes/borderRadius/shadow
         const colors = style.colors || {};
         const sizes = style.sizes || {};
         const borderRadius = style.borderRadius || {};
         const shadow = style.shadow || {};
         const fs = sizes.fontSize || 1;
 
+        // Определяем фон из headerBackground
         const background = colors.headerBackground || 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)';
 
         return `
@@ -422,13 +427,14 @@
         `;
     }
 
-
+    // ИСПРАВЛЕНО: добавлен параметр clientId
     function createBusinessHoursWidget(containerObj, config, uniqueClass, clientId) {
         const { overlay, container } = containerObj;
         
         // Безопасное отображение иконки
         const iconHtml = renderIcon(config);
 
+        // Блокируем контент если включена опция
         if (config.blockContent) {
             document.body.style.overflow = 'hidden';
         }
@@ -466,7 +472,7 @@
             overlay,
             container,
             config,
-            clientId, 
+            clientId, // ИСПРАВЛЕНО: теперь переменная доступна
             isShown: false,
             
             show() {
