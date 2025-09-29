@@ -312,8 +312,20 @@
         `;
     }
 
-    // Загрузка конфигурации
+    // ИСПРАВЛЕНО: Приоритет встроенных конфигов
     async function loadConfig(clientId, baseUrl) {
+        // Сначала проверяем встроенные конфиги
+        const embeddedScript = document.querySelector(`#bhw-config-${clientId}`);
+        if (embeddedScript) {
+            try {
+                const config = JSON.parse(embeddedScript.textContent);
+                console.log(`[BusinessHoursWidget] 📄 Встроенный конфиг для "${clientId}" загружен`);
+                return config;
+            } catch (err) {
+                throw new Error('Ошибка парсинга встроенного конфига: ' + err.message);
+            }
+        }
+
         if (clientId === 'local') {
             const localScript = document.querySelector('#bhw-local-config');
             if (!localScript) {
@@ -328,7 +340,14 @@
             const configUrl = `${baseUrl}/configs/${encodeURIComponent(clientId)}.json?v=${Date.now()}`;
             try {
                 const response = await fetch(configUrl, { cache: 'no-cache', headers: { 'Accept': 'application/json' } });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                if (!response.ok) {
+                    // Проверяем content-type для более точной диагностики
+                    const contentType = response.headers.get('content-type') || '';
+                    if (!contentType.includes('application/json')) {
+                        throw new Error(`Сервер вернул HTML вместо JSON (content-type: ${contentType})`);
+                    }
+                    throw new Error(`HTTP ${response.status}`);
+                }
                 return await response.json();
             } catch (error) {
                 console.warn(`[BusinessHoursWidget] Основной конфиг недоступен, используем demo: ${error.message}`);
@@ -427,7 +446,6 @@
         `;
     }
 
-    // ИСПРАВЛЕНО: добавлен параметр clientId
     function createBusinessHoursWidget(containerObj, config, uniqueClass, clientId) {
         const { overlay, container } = containerObj;
         
@@ -472,7 +490,7 @@
             overlay,
             container,
             config,
-            clientId, // ИСПРАВЛЕНО: теперь переменная доступна
+            clientId,
             isShown: false,
             
             show() {
@@ -521,15 +539,12 @@
         // Обработчики событий
         setupEventHandlers(widget);
         
-        // Глобальный доступ к виджету (совместимость с вашим index.html)
+        // Глобальный доступ к виджету
         window.BusinessHoursWidgets = window.BusinessHoursWidgets || {};
         window.BusinessHoursWidgets[clientId] = widget;
         
         // Настройка триггеров (по умолчанию выключены для демо)
         setupTriggers(widget, config.triggers || {});
-        
-        // Применяем уникальные стили после создания HTML
-        applyCustomStyles(containerObj, config, uniqueClass);
     }
 
     function setupEventHandlers(widget) {
