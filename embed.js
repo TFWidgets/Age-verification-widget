@@ -1,9 +1,9 @@
 (function() {
     'use strict';
 
-    // Базовые CSS стили с CSS-переменными для полной кастомизации
+    // Базовые CSS стили с унифицированными CSS-переменными
     const inlineCSS = `
-        .bhw-overlay {
+        .bhw-age-overlay {
             position: fixed;
             inset: 0;
             background: var(--bhw-overlay, rgba(0,0,0,0.85));
@@ -12,158 +12,51 @@
             justify-content: center;
             z-index: 99999;
             backdrop-filter: blur(8px);
-            font-family: var(--bhw-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+            font-family: var(--bhw-font, 'Inter', system-ui, sans-serif);
             opacity: 0;
             transition: opacity 0.4s ease;
         }
         
-        .bhw-overlay.show {
+        .bhw-age-overlay.show {
             opacity: 1;
         }
         
-        .bhw-container {
-            font-family: var(--bhw-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
-            max-width: var(--bhw-max-width, 420px);
-            margin: var(--bhw-margin, 20px auto);
+        .bhw-age-card {
             width: min(90vw, 420px);
-        }
-        
-        .bhw-widget {
-            background: var(--bhw-bg, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
-            border-radius: var(--bhw-radius, 20px);
-            padding: var(--bhw-padding, 30px);
-            color: var(--bhw-text-color, white);
-            box-shadow: var(--bhw-shadow, 0 20px 60px rgba(102, 126, 234, 0.4));
+            background: var(--bhw-bg, #ffffff);
+            border-radius: var(--bhw-widget-radius, 20px);
+            box-shadow: var(--bhw-shadow, 0 25px 70px rgba(0,0,0,0.4));
             position: relative;
             overflow: hidden;
             transform: scale(0.85) translateY(30px);
             transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         
-        .bhw-overlay.show .bhw-widget {
+        .bhw-age-overlay.show .bhw-age-card {
             transform: scale(1) translateY(0);
         }
         
-        .bhw-widget::before {
+        .bhw-age-header {
+            background: var(--bhw-header-bg, linear-gradient(135deg, #dc2626 0%, #991b1b 100%));
+            padding: var(--bhw-padding, 32px 28px);
+            text-align: center;
+            color: var(--bhw-text-color, white);
+            position: relative;
+        }
+        
+        .bhw-age-header::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: var(--bhw-overlay-inner, radial-gradient(circle at 30% 20%, rgba(255,255,255,0.15) 0%, transparent 50%));
+            background: var(--bhw-overlay-inner, 
+                radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)
+            );
             pointer-events: none;
         }
         
-        .bhw-header {
-            text-align: var(--bhw-header-align, center);
-            margin-bottom: var(--bhw-header-margin-bottom, 25px);
-            position: relative;
-            z-index: 1;
-        }
-        
-        .bhw-business-name {
-            font-size: var(--bhw-name-size, 1.8em);
-            font-weight: var(--bhw-name-weight, 800);
-            margin-bottom: var(--bhw-name-margin-bottom, 8px);
-            text-shadow: var(--bhw-name-shadow, 0 2px 8px rgba(0,0,0,0.3));
-            color: var(--bhw-name-color, inherit);
-            letter-spacing: -0.2px;
-        }
-        
-        .bhw-status-badge {
-            font-size: var(--bhw-badge-size, 1.05em);
-            opacity: var(--bhw-badge-opacity, 0.9);
-            font-weight: var(--bhw-badge-weight, 500);
-            margin: 0 0 20px 0;
-        }
-        
-        .bhw-hours-table {
-            background: var(--bhw-table-bg, rgba(255, 255, 255, 0.95));
-            border-radius: var(--bhw-table-radius, 15px);
-            padding: var(--bhw-table-padding, 28px);
-            color: var(--bhw-table-text, #333);
-            margin: var(--bhw-table-margin, 20px 0);
-            position: relative;
-            z-index: 1;
-            backdrop-filter: var(--bhw-table-backdrop-filter, blur(10px));
-            text-align: center;
-        }
-        
-        .bhw-hours-row {
-            font-size: var(--bhw-row-size, 1.1em);
-            line-height: 1.5;
-            margin: 0 0 28px 0;
-            color: var(--bhw-row-color, #555555);
-        }
-        
-        .bhw-day-name {
-            display: flex;
-            gap: var(--bhw-day-gap, 12px);
-            flex-direction: column;
-        }
-        
-        .bhw-hours-time {
-            padding: var(--bhw-time-padding, 16px 24px);
-            border-radius: var(--bhw-time-radius, 12px);
-            font-size: var(--bhw-time-size, 1.1em);
-            font-weight: var(--bhw-time-weight, 700);
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            font-family: var(--bhw-time-font, inherit);
-            text-decoration: none;
-            display: inline-block;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        
-        .bhw-hours-time::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(45deg, rgba(255,255,255,0.15) 0%, transparent 50%);
-            pointer-events: none;
-        }
-        
-        .bhw-hours-time.open {
-            background: var(--bhw-open-color, #4ade80);
-            color: var(--bhw-badge-text, white);
-            order: 1;
-        }
-        
-        .bhw-hours-time.open:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--bhw-open-shadow, 0 8px 24px rgba(74, 222, 128, 0.4));
-        }
-        
-        .bhw-hours-time.closed {
-            background: var(--bhw-closed-color, #f1f5f9);
-            color: var(--bhw-closed-text, #64748b);
-            order: 2;
-        }
-        
-        .bhw-hours-time.closed:hover {
-            background: var(--bhw-closed-hover, #e2e8f0);
-            transform: translateY(-1px);
-        }
-        
-        .bhw-closing-info {
-            background: var(--bhw-info-bg, rgba(255, 255, 255, 0.2));
-            padding: var(--bhw-info-padding, 20px 28px 28px);
-            border-radius: var(--bhw-info-radius, 10px);
-            text-align: center;
-            font-weight: var(--bhw-info-weight, 600);
-            margin-bottom: var(--bhw-info-margin-bottom, 0);
-            color: var(--bhw-info-color, inherit);
-            position: relative;
-            z-index: 1;
-            font-size: var(--bhw-info-size, 0.85em);
-            border-top: 1px solid rgba(255,255,255,0.2);
-            margin-top: 20px;
-        }
-        
-        .bhw-timezone-info {
-            font-size: var(--bhw-tz-size, 3.5em);
+        .bhw-age-icon {
+            font-size: var(--bhw-icon-size, 3.5em);
             margin-bottom: 12px;
             display: block;
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
@@ -171,59 +64,125 @@
             z-index: 1;
         }
         
-        .bhw-loading {
-            text-align: center;
-            padding: var(--bhw-loading-padding, 40px);
+        .bhw-age-title {
+            font-size: var(--bhw-title-size, 1.8em);
+            font-weight: var(--bhw-title-weight, 800);
+            margin: 0 0 8px 0;
+            text-shadow: var(--bhw-text-shadow, 0 2px 8px rgba(0,0,0,0.3));
+            letter-spacing: var(--bhw-title-spacing, -0.2px);
             position: relative;
             z-index: 1;
-            color: var(--bhw-loading-text-color, white);
         }
         
-        .bhw-spinner {
-            width: 40px;
-            height: 40px;
-            border: var(--bhw-spinner-border, 3px solid rgba(255,255,255,0.3));
-            border-top: var(--bhw-spinner-top-border, 3px solid white);
-            border-radius: 50%;
-            animation: bhw-spin 1s linear infinite;
-            margin: var(--bhw-spinner-margin, 0 auto 15px);
+        .bhw-age-subtitle {
+            font-size: var(--bhw-subtitle-size, 1.05em);
+            opacity: var(--bhw-subtitle-opacity, 0.9);
+            font-weight: var(--bhw-subtitle-weight, 500);
+            margin: 0;
+            position: relative;
+            z-index: 1;
         }
         
-        .bhw-error {
-            background: var(--bhw-error-bg, linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%));
-            padding: var(--bhw-error-padding, 30px);
-            border-radius: var(--bhw-error-radius, 16px);
-            color: var(--bhw-error-text, white);
+        .bhw-age-content {
+            padding: var(--bhw-content-padding, 32px 28px);
             text-align: center;
-            box-shadow: var(--bhw-error-shadow, 0 15px 40px rgba(255,107,107,0.4));
+            color: var(--bhw-content-text-color, #333333);
         }
         
-        @keyframes bhw-spin {
+        .bhw-age-message {
+            font-size: var(--bhw-message-size, 1.1em);
+            line-height: 1.5;
+            margin: 0 0 28px 0;
+            color: var(--bhw-message-color, #555555);
+        }
+        
+        .bhw-age-buttons {
+            display: flex;
+            gap: var(--bhw-gap, 12px);
+            flex-direction: column;
+        }
+        
+        .bhw-age-btn {
+            padding: var(--bhw-btn-padding, 16px 24px);
+            border-radius: var(--bhw-btn-radius, 12px);
+            font-size: var(--bhw-btn-size, 1.1em);
+            font-weight: var(--bhw-btn-weight, 700);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            font-family: var(--bhw-btn-font, inherit);
+        }
+        
+        .bhw-age-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .bhw-age-btn-yes {
+            background: var(--bhw-btn-yes-bg, linear-gradient(135deg, #10b981 0%, #059669 100%));
+            color: var(--bhw-btn-yes-color, white);
+            order: 1;
+        }
+        
+        .bhw-age-btn-yes:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--bhw-btn-yes-shadow, 0 8px 24px rgba(16, 185, 129, 0.4));
+        }
+        
+        .bhw-age-btn-no {
+            background: var(--bhw-btn-no-bg, #f1f5f9);
+            color: var(--bhw-btn-no-color, #64748b);
+            order: 2;
+        }
+        
+        .bhw-age-btn-no:hover {
+            background: var(--bhw-btn-no-bg-hover, #e2e8f0);
+            transform: translateY(-1px);
+        }
+        
+        .bhw-age-footer {
+            padding: var(--bhw-footer-padding, 20px 28px 28px);
+            text-align: center;
+            font-size: var(--bhw-footer-size, 0.85em);
+            color: var(--bhw-footer-color, #9ca3af);
+            border-top: 1px solid #f1f5f9;
+        }
+        
+        @keyframes bhw-age-spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
         
         @media (max-width: 480px) {
-            .bhw-container {
+            .bhw-age-card {
                 width: min(95vw, 380px);
             }
-            .bhw-widget {
-                padding: var(--bhw-padding-mobile, 20px);
+            .bhw-age-header {
+                padding: var(--bhw-padding-mobile, 28px 24px);
             }
-            .bhw-hours-table {
-                padding: var(--bhw-table-padding-mobile, 24px);
+            .bhw-age-content {
+                padding: var(--bhw-content-padding-mobile, 28px 24px);
             }
-            .bhw-business-name {
-                font-size: var(--bhw-name-size-mobile, 1.6em);
+            .bhw-age-title {
+                font-size: var(--bhw-title-size-mobile, 1.6em);
             }
-            .bhw-hours-row {
-                font-size: var(--bhw-row-size-mobile, 1.05em);
+            .bhw-age-message {
+                font-size: var(--bhw-message-size-mobile, 1.05em);
             }
-            .bhw-day-name {
-                gap: var(--bhw-day-gap-mobile, 10px);
+            .bhw-age-buttons {
+                gap: var(--bhw-gap-mobile, 10px);
             }
         }
     `;
+
+    // Интеграция в общую экосистему BHW виджетов
+    window.BusinessHoursWidgets = window.BusinessHoursWidgets || {};
+    window.BusinessHoursWidgets.ageVerification = window.BusinessHoursWidgets.ageVerification || {};
 
     try {
         const currentScript = document.currentScript || (function() {
@@ -233,253 +192,216 @@
 
         let clientId = currentScript.dataset.id;
         if (!clientId) {
-            console.error('[BusinessHoursWidget] data-id обязателен');
+            console.error('[BusinessHoursAgeVerificationWidget] data-id обязателен');
             return;
         }
 
-        // Убираем .js расширение
-        if (clientId.endsWith('.js')) {
-            clientId = clientId.slice(0, -3);
-        }
+        clientId = normalizeId(clientId);
 
-        // Проверяем, не обработан ли уже этот конкретный скрипт
+        // Защита от повторного выполнения
         if (currentScript.dataset.bhwMounted === '1') return;
         currentScript.dataset.bhwMounted = '1';
 
-        console.log(`[BusinessHoursWidget] Normalized clientId: ${clientId}`);
+        console.log(`[BusinessHoursAgeVerificationWidget] 🚀 Инициализация виджета "${clientId}"`);
 
-        // Добавляем стили один раз
-        if (!document.querySelector('#business-hours-widget-styles')) {
+        // Уникальный ID стилей для age verification виджета
+        if (!document.querySelector('#business-hours-age-verification-widget-styles')) {
             const style = document.createElement('style');
-            style.id = 'business-hours-widget-styles';
+            style.id = 'business-hours-age-verification-widget-styles';
             style.textContent = inlineCSS;
             document.head.appendChild(style);
         }
 
-        // Определяем baseUrl
-        const baseUrl = currentScript.src ? 
-            currentScript.src.replace(/\/[^\/]*$/, '') : 
-            './';
-
-        // Создаем контейнер с уникальным классом
-        const uniqueClass = `bhw-${clientId}-${Date.now()}`;
-        const containerObj = createContainer(currentScript, clientId, uniqueClass);
+        const baseUrl = getBasePath(currentScript.src);
+        const uniqueClass = `bhw-age-${clientId}-${Date.now()}`;
         
-        // Показываем загрузку
-        showLoading(containerObj);
-
         // Загружаем конфигурацию
         loadConfig(clientId, baseUrl)
-            .then(config => {
-                applyCustomStyles(containerObj, config, uniqueClass);
-                createBusinessHoursWidget(containerObj, config, uniqueClass, clientId);
-                console.log(`[BusinessHoursWidget] Виджет ${clientId} успешно создан`);
+            .then(fetchedConfig => {
+                const finalConfig = mergeDeep(getDefaultConfig(), fetchedConfig);
+                console.log(`[BusinessHoursAgeVerificationWidget] 📋 Конфиг для "${clientId}":`, finalConfig);
+                
+                const widget = createAgeVerificationWidget(finalConfig, uniqueClass, clientId);
+                window.BusinessHoursWidgets.ageVerification[clientId] = widget;
+                
+                // Настройка триггеров (по умолчанию выключены для демо)
+                setupTriggers(widget, finalConfig.triggers || {});
+                
+                console.log(`[BusinessHoursAgeVerificationWidget] ✅ Виджет "${clientId}" создан`);
             })
             .catch(error => {
-                console.error('[BusinessHoursWidget] Ошибка:', error);
-                showError(containerObj, clientId, error.message);
+                console.warn(`[BusinessHoursAgeVerificationWidget] ⚠️ Используем дефолт для "${clientId}":`, error.message);
+                const defaultConfig = getDefaultConfig();
+                const widget = createAgeVerificationWidget(defaultConfig, uniqueClass, clientId);
+                window.BusinessHoursWidgets.ageVerification[clientId] = widget;
+                setupTriggers(widget, defaultConfig.triggers || {});
             });
 
     } catch (error) {
-        console.error('[BusinessHoursWidget] Критическая ошибка:', error);
+        console.error('[BusinessHoursAgeVerificationWidget] 💥 Критическая ошибка:', error);
     }
 
-    function createContainer(scriptElement, clientId, uniqueClass) {
-        // Создаем overlay для age verification
-        const overlay = document.createElement('div');
-        overlay.className = `bhw-overlay ${uniqueClass}`;
-        overlay.setAttribute('aria-hidden', 'true');
-        document.body.appendChild(overlay);
+    function normalizeId(id) {
+        return (id || 'demo').replace(/\.(json|js)$/i, '');
+    }
+
+    function getBasePath(src) {
+        if (!src) return './';
+        try {
+            const url = new URL(src, location.href);
+            return url.origin + url.pathname.replace(/\/[^\/]*$/, '/');
+        } catch (error) {
+            return './';
+        }
+    }
+
+    // Унифицированная структура конфига (1-в-1 для всех)
+    function getDefaultConfig() {
+        return {
+            title: "Age Verification",
+            subtitle: "Restricted Content", 
+            message: "You must be 18 or older to view this content. Please confirm your age to continue.",
+            footerText: "By clicking 'Yes', you confirm that you are of legal age.",
+            yesButtonText: "Yes, I'm 18+",
+            noButtonText: "No, I'm under 18",
+            iconHtml: "&#128286;",
+            redirectUrl: "https://www.google.com",
+            blockContent: true,
+            frequency: "30d",
+            triggers: {
+                showOnLoad: false,    // Для демо выключено
+                showDelay: 0,
+                showOnExit: false,
+                showOnScroll: 0       // Процент прокрутки (0 = выключено)
+            },
+            style: {
+                fontFamily: "'Inter', system-ui, sans-serif",
+                valueFontFamily: "'Inter', system-ui, sans-serif",
+                colors: {
+                    background: "#ffffff",
+                    overlay: "rgba(0,0,0,0.85)",
+                    headerBackground: "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)",
+                    text: "white",
+                    contentText: "#333333",
+                    messageText: "#555555",
+                    footerText: "#9ca3af",
+                    btnYes: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                    btnYesText: "white",
+                    btnNo: "#f1f5f9",
+                    btnNoText: "#64748b",
+                    btnNoHover: "#e2e8f0"
+                },
+                borderRadius: {
+                    widget: 20,
+                    buttons: 12
+                },
+                sizes: {
+                    fontSize: 1.0,
+                    padding: 32,
+                    contentPadding: 32,
+                    footerPadding: 20,
+                    gap: 12,
+                    iconSize: 56
+                },
+                shadow: {
+                    widget: "0 25px 70px rgba(0,0,0,0.4)",
+                    text: "0 2px 8px rgba(0,0,0,0.3)",
+                    btnYesHover: "0 8px 24px rgba(16, 185, 129, 0.4)"
+                }
+            }
+        };
+    }
+
+    function mergeDeep(base, override) {
+        const result = { ...base, ...override };
+
+        // Сливаем объекты первого уровня
+        for (const key of ['style', 'triggers']) {
+            if (base[key] && typeof base[key] === 'object' && !Array.isArray(base[key])) {
+                result[key] = { ...(base[key] || {}), ...(override[key] || {}) };
+            }
+        }
+
+        // Сливаем объекты второго уровня в style
+        if (result.style) {
+            for (const subKey of ['colors', 'borderRadius', 'sizes', 'shadow']) {
+                if (base.style[subKey] && typeof base.style[subKey] === 'object' && !Array.isArray(base.style[subKey])) {
+                    result.style[subKey] = { ...(base.style[subKey] || {}), ...(override.style?.[subKey] || {}) };
+                }
+            }
+        }
         
-        // Создаем контейнер внутри overlay
-        const container = document.createElement('div');
-        container.id = `business-hours-widget-${clientId}`;
-        container.className = `bhw-container`;
-        overlay.appendChild(container);
-        
-        // Возвращаем объект с обеими ссылками
-        return { overlay, container };
+        return result;
     }
 
-    function showLoading(containerObj) {
-        containerObj.container.innerHTML = `
-            <div class="bhw-widget">
-                <div class="bhw-loading">
-                    <div class="bhw-spinner"></div>
-                    <div>Loading age verification...</div>
-                </div>
-            </div>
-        `;
-    }
-
-    // ИСПРАВЛЕНО: Приоритет встроенных конфигов
     async function loadConfig(clientId, baseUrl) {
-        // Сначала проверяем встроенные конфиги
-        const embeddedScript = document.querySelector(`#bhw-config-${clientId}`);
-        if (embeddedScript) {
+        // Локальный конфиг для разработки
+        if (clientId === 'local') {
+            const localScript = document.querySelector('#bhw-age-local-config');
+            if (!localScript) {
+                throw new Error('Локальный конфиг не найден (#bhw-age-local-config)');
+            }
             try {
-                const config = JSON.parse(embeddedScript.textContent);
-                console.log(`[BusinessHoursWidget] 📄 Встроенный конфиг для "${clientId}" загружен`);
+                const config = JSON.parse(localScript.textContent);
+                console.log(`[BusinessHoursAgeVerificationWidget] 📄 Локальный конфиг загружен`);
                 return config;
             } catch (err) {
-                throw new Error('Ошибка парсинга встроенного конфига: ' + err.message);
+                throw new Error('Ошибка парсинга локального JSON: ' + err.message);
             }
         }
 
-        if (clientId === 'local') {
-            const localScript = document.querySelector('#bhw-local-config');
-            if (!localScript) {
-                throw new Error('Локальный конфиг не найден на странице (#bhw-local-config)');
-            }
-            try {
-                return JSON.parse(localScript.textContent);
-            } catch (err) {
-                throw new Error('Ошибка парсинга локального конфига: ' + err.message);
-            }
-        } else {
-            const configUrl = `${baseUrl}/configs/${encodeURIComponent(clientId)}.json?v=${Date.now()}`;
-            try {
-                const response = await fetch(configUrl, { cache: 'no-cache', headers: { 'Accept': 'application/json' } });
-                if (!response.ok) {
-                    // Проверяем content-type для более точной диагностики
-                    const contentType = response.headers.get('content-type') || '';
-                    if (!contentType.includes('application/json')) {
-                        throw new Error(`Сервер вернул HTML вместо JSON (content-type: ${contentType})`);
-                    }
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                return await response.json();
-            } catch (error) {
-                console.warn(`[BusinessHoursWidget] Основной конфиг недоступен, используем demo: ${error.message}`);
-                const demoResponse = await fetch(`${baseUrl}/configs/demo.json?v=${Date.now()}`, {
-                    cache: 'no-cache',
-                    headers: { 'Accept': 'application/json' }
-                });
-                if (!demoResponse.ok) throw new Error('Конфигурация недоступна');
-                return await demoResponse.json();
-            }
+        // Загрузка с сервера
+        const configUrl = `${baseUrl}configs/${encodeURIComponent(clientId)}.json?v=${Date.now()}`;
+        console.log(`[BusinessHoursAgeVerificationWidget] 🌐 Загружаем: ${configUrl}`);
+        
+        const response = await fetch(configUrl, { 
+            cache: 'no-store',
+            headers: { 'Accept': 'application/json' }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-    }
-
-    // Применение кастомных стилей с уникальным классом
-    function applyCustomStyles(containerObj, config, uniqueClass) {
-        // ИСПРАВЛЕНО: читаем config.style вместо config.styling
-        const s = config.style || {};
         
-        // Создаем уникальные стили для этого виджета
-        const styleElement = document.createElement('style');
-        styleElement.textContent = generateUniqueStyles(uniqueClass, s);
-        containerObj.container.appendChild(styleElement);
+        return await response.json();
     }
 
-    function generateUniqueStyles(uniqueClass, style) {
-        // ИСПРАВЛЕНО: правильно читаем структуру style.colors/sizes/borderRadius/shadow
-        const colors = style.colors || {};
-        const sizes = style.sizes || {};
-        const borderRadius = style.borderRadius || {};
-        const shadow = style.shadow || {};
-        const fs = sizes.fontSize || 1;
+    function createAgeVerificationWidget(config, uniqueClass, id) {
+        const overlay = document.createElement('div');
+        overlay.className = `bhw-age-overlay ${uniqueClass}`;
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(overlay);
 
-        // Определяем фон из headerBackground
-        const background = colors.headerBackground || 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)';
+        // Применяем кастомные стили
+        applyCustomStyles(uniqueClass, config.style);
 
-        return `
-            .${uniqueClass} {
-                font-family: ${style.fontFamily || 'inherit'};
-            }
-            
-            .${uniqueClass} .bhw-widget {
-                background: ${background};
-                border-radius: ${borderRadius.widget || 20}px;
-                padding: ${sizes.padding || 32}px;
-                color: ${colors.text || 'white'};
-                box-shadow: ${shadow.widget || '0 25px 70px rgba(0,0,0,0.4)'};
-            }
-            
-            .${uniqueClass} .bhw-overlay {
-                background: ${colors.overlay || 'rgba(0,0,0,0.85)'};
-            }
-            
-            .${uniqueClass} .bhw-business-name {
-                font-size: ${1.8 * fs}em;
-            }
-            
-            .${uniqueClass} .bhw-hours-table {
-                background: ${colors.background || '#ffffff'};
-                color: ${colors.contentText || '#333'};
-            }
-            
-            .${uniqueClass} .bhw-hours-row {
-                color: ${colors.messageText || '#555'};
-            }
-            
-            .${uniqueClass} .bhw-hours-time.open {
-                background: ${colors.btnYes || 'linear-gradient(135deg, #10b981 0%, #059669 100%)'};
-                color: ${colors.btnYesText || 'white'};
-            }
-            
-            .${uniqueClass} .bhw-hours-time.open:hover {
-                box-shadow: ${shadow.btnYesHover || '0 8px 24px rgba(16, 185, 129, 0.4)'};
-            }
-            
-            .${uniqueClass} .bhw-hours-time.closed {
-                background: ${colors.btnNo || '#f1f5f9'};
-                color: ${colors.btnNoText || '#64748b'};
-            }
-            
-            .${uniqueClass} .bhw-hours-time.closed:hover {
-                background: ${colors.btnNoHover || '#e2e8f0'};
-            }
-            
-            .${uniqueClass} .bhw-closing-info {
-                color: ${colors.footerText || '#9ca3af'};
-            }
-            
-            @media (max-width: 480px) {
-                .${uniqueClass} .bhw-widget {
-                    padding: ${Math.round((sizes.padding || 32) * 0.8)}px;
-                }
-                .${uniqueClass} .bhw-business-name {
-                    font-size: ${1.6 * fs}em;
-                }
-            }
-        `;
-    }
-
-    function createBusinessHoursWidget(containerObj, config, uniqueClass, clientId) {
-        const { overlay, container } = containerObj;
-        
         // Безопасное отображение иконки
         const iconHtml = renderIcon(config);
 
-        // Блокируем контент если включена опция
-        if (config.blockContent) {
-            document.body.style.overflow = 'hidden';
-        }
-
-        container.innerHTML = `
-            <div class="bhw-widget" role="dialog" aria-modal="true">
-                <div class="bhw-header">
-                    <div class="bhw-timezone-info">${iconHtml}</div>
-                    <h2 class="bhw-business-name">${escapeHtml(config.title || 'Age Verification')}</h2>
-                    <p class="bhw-status-badge">${escapeHtml(config.subtitle || 'Restricted Content')}</p>
+        // HTML структура
+        overlay.innerHTML = `
+            <div class="bhw-age-card" role="dialog" aria-modal="true">
+                <div class="bhw-age-header">
+                    <div class="bhw-age-icon">${iconHtml}</div>
+                    <h2 class="bhw-age-title">${escapeHtml(config.title)}</h2>
+                    <p class="bhw-age-subtitle">${escapeHtml(config.subtitle)}</p>
                 </div>
                 
-                <div class="bhw-hours-table">
-                    <p class="bhw-hours-row">${escapeHtml(config.message || 'You must be 18 or older to view this content.')}</p>
+                <div class="bhw-age-content">
+                    <p class="bhw-age-message">${escapeHtml(config.message)}</p>
                     
-                    <div class="bhw-day-name">
-                        <button class="bhw-hours-time open" type="button">
-                            ${escapeHtml(config.yesButtonText || "Yes, I'm 18+")}
+                    <div class="bhw-age-buttons">
+                        <button class="bhw-age-btn bhw-age-btn-yes" type="button">
+                            ${escapeHtml(config.yesButtonText)}
                         </button>
-                        <button class="bhw-hours-time closed" type="button">
-                            ${escapeHtml(config.noButtonText || "No, I'm under 18")}
+                        <button class="bhw-age-btn bhw-age-btn-no" type="button">
+                            ${escapeHtml(config.noButtonText)}
                         </button>
                     </div>
                 </div>
                 
                 ${config.footerText ? `
-                    <div class="bhw-closing-info">
+                    <div class="bhw-age-footer">
                         ${escapeHtml(config.footerText)}
                     </div>
                 ` : ''}
@@ -488,13 +410,12 @@
 
         const widget = {
             overlay,
-            container,
             config,
-            clientId,
+            id,
             isShown: false,
             
             show() {
-                if (this.isShown || !shouldShowByFrequency(this.config.frequency, this.clientId)) return;
+                if (this.isShown || !shouldShowByFrequency(this.config.frequency, this.id)) return;
                 
                 this.overlay.style.display = 'flex';
                 setTimeout(() => this.overlay.classList.add('show'), 10);
@@ -523,7 +444,7 @@
             },
             
             approve() {
-                markAccepted(this.config.frequency, this.clientId);
+                markAccepted(this.config.frequency, this.id);
                 this.hide();
             },
             
@@ -539,24 +460,87 @@
         // Обработчики событий
         setupEventHandlers(widget);
         
-        // Глобальный доступ к виджету
-        window.BusinessHoursWidgets = window.BusinessHoursWidgets || {};
-        window.BusinessHoursWidgets[clientId] = widget;
+        return widget;
+    }
+
+    function applyCustomStyles(uniqueClass, style) {
+        const styleId = `bhw-age-style-${uniqueClass}`;
+        let styleElement = document.getElementById(styleId);
         
-        // Настройка триггеров (по умолчанию выключены для демо)
-        setupTriggers(widget, config.triggers || {});
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            styleElement.id = styleId;
+            document.head.appendChild(styleElement);
+        }
+        
+        styleElement.textContent = generateUniqueStyles(uniqueClass, style);
+    }
+
+    function generateUniqueStyles(uniqueClass, style) {
+        const s = style || {};
+        const colors = s.colors || {};
+        const sizes = s.sizes || {};
+        const borderRadius = s.borderRadius || {};
+        const shadow = s.shadow || {};
+        const fs = sizes.fontSize || 1;
+
+        return `
+            .${uniqueClass} {
+                --bhw-font: ${s.fontFamily || "'Inter', system-ui, sans-serif"};
+                --bhw-value-font: ${s.valueFontFamily || "'Inter', system-ui, sans-serif"};
+                --bhw-bg: ${colors.background || "#ffffff"};
+                --bhw-overlay: ${colors.overlay || "rgba(0,0,0,0.85)"};
+                --bhw-widget-radius: ${borderRadius.widget || 20}px;
+                --bhw-padding: ${sizes.padding || 32}px 28px;
+                --bhw-padding-mobile: ${Math.round((sizes.padding || 32) * 0.875)}px 24px;
+                --bhw-content-padding: ${sizes.contentPadding || 32}px 28px;
+                --bhw-content-padding-mobile: ${Math.round((sizes.contentPadding || 32) * 0.875)}px 24px;
+                --bhw-footer-padding: ${sizes.footerPadding || 20}px 28px 28px;
+                --bhw-text-color: ${colors.text || "white"};
+                --bhw-content-text-color: ${colors.contentText || "#333333"};
+                --bhw-message-color: ${colors.messageText || "#555555"};
+                --bhw-footer-color: ${colors.footerText || "#9ca3af"};
+                --bhw-header-bg: ${colors.headerBackground || "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)"};
+                --bhw-shadow: ${shadow.widget || "0 25px 70px rgba(0,0,0,0.4)"};
+                --bhw-text-shadow: ${shadow.text || "0 2px 8px rgba(0,0,0,0.3)"};
+                --bhw-icon-size: ${(sizes.iconSize || 56) * fs}px;
+                --bhw-title-size: ${1.8 * fs}em;
+                --bhw-title-size-mobile: ${1.6 * fs}em;
+                --bhw-title-weight: 800;
+                --bhw-title-spacing: -0.2px;
+                --bhw-subtitle-size: ${1.05 * fs}em;
+                --bhw-subtitle-opacity: 0.9;
+                --bhw-subtitle-weight: 500;
+                --bhw-message-size: ${1.1 * fs}em;
+                --bhw-message-size-mobile: ${1.05 * fs}em;
+                --bhw-footer-size: ${0.85 * fs}em;
+                --bhw-gap: ${sizes.gap || 12}px;
+                --bhw-gap-mobile: ${Math.round((sizes.gap || 12) * 0.83)}px;
+                --bhw-btn-padding: ${Math.round(16 * fs)}px ${Math.round(24 * fs)}px;
+                --bhw-btn-radius: ${borderRadius.buttons || 12}px;
+                --bhw-btn-size: ${1.1 * fs}em;
+                --bhw-btn-weight: 700;
+                --bhw-btn-font: inherit;
+                --bhw-btn-yes-bg: ${colors.btnYes || "linear-gradient(135deg, #10b981 0%, #059669 100%)"};
+                --bhw-btn-yes-color: ${colors.btnYesText || "white"};
+                --bhw-btn-yes-shadow: ${shadow.btnYesHover || "0 8px 24px rgba(16, 185, 129, 0.4)"};
+                --bhw-btn-no-bg: ${colors.btnNo || "#f1f5f9"};
+                --bhw-btn-no-color: ${colors.btnNoText || "#64748b"};
+                --bhw-btn-no-bg-hover: ${colors.btnNoHover || "#e2e8f0"};
+            }
+        `;
     }
 
     function setupEventHandlers(widget) {
-        const { container } = widget;
+        const { overlay } = widget;
         
         // Кнопка подтверждения возраста
-        container.querySelector('.bhw-hours-time.open').addEventListener('click', () => {
+        overlay.querySelector('.bhw-age-btn-yes').addEventListener('click', () => {
             widget.approve();
         });
         
         // Кнопка отказа
-        container.querySelector('.bhw-hours-time.closed').addEventListener('click', () => {
+        overlay.querySelector('.bhw-age-btn-no').addEventListener('click', () => {
             widget.decline();
         });
     }
@@ -564,7 +548,7 @@
     // Система триггеров
     function setupTriggers(widget, triggers) {
         // Проверяем частоту показа
-        if (!shouldShowByFrequency(widget.config.frequency, widget.clientId)) return;
+        if (!shouldShowByFrequency(widget.config.frequency, widget.id)) return;
 
         // Автопоказ при загрузке
         if (triggers.showOnLoad) {
@@ -601,10 +585,10 @@
         if (frequency === 'always') return true;
         
         if (frequency === 'session') {
-            return !sessionStorage.getItem(`bhw-accepted-${id}`);
+            return !sessionStorage.getItem(`bhw-age-accepted-${id}`);
         }
         
-        const lastShown = parseInt(localStorage.getItem(`bhw-accepted-${id}`) || '0');
+        const lastShown = parseInt(localStorage.getItem(`bhw-age-accepted-${id}`) || '0');
         const now = Date.now();
         const intervals = { 
             '24h': 24 * 60 * 60 * 1000, 
@@ -617,9 +601,9 @@
 
     function markAccepted(frequency, id) {
         if (frequency === 'session') {
-            sessionStorage.setItem(`bhw-accepted-${id}`, '1');
+            sessionStorage.setItem(`bhw-age-accepted-${id}`, '1');
         } else if (frequency !== 'always') {
-            localStorage.setItem(`bhw-accepted-${id}`, Date.now().toString());
+            localStorage.setItem(`bhw-age-accepted-${id}`, Date.now().toString());
         }
     }
 
@@ -637,21 +621,5 @@
         const div = document.createElement('div');
         div.textContent = text || '';
         return div.innerHTML;
-    }
-
-    function showError(containerObj, clientId, message) {
-        containerObj.container.innerHTML = `
-            <div class="bhw-widget bhw-error">
-                <h3 style="margin: 0 0 15px 0;">🔞 Age verification unavailable</h3>
-                <p style="margin: 0; opacity: 0.9; font-size: 0.9em;">ID: ${escapeHtml(clientId)}</p>
-                <details style="margin-top: 15px;">
-                    <summary style="cursor: pointer; opacity: 0.8;">Details</summary>
-                    <p style="margin: 10px 0 0 0; font-size: 0.8em; opacity: 0.7;">${escapeHtml(message)}</p>
-                </details>
-            </div>
-        `;
-        // Показываем ошибку
-        containerObj.overlay.style.display = 'flex';
-        setTimeout(() => containerObj.overlay.classList.add('show'), 10);
     }
 })();
