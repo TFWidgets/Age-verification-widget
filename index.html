@@ -85,25 +85,6 @@
             h1 { font-size: 1.9em; }
         }
     </style>
-    
-    <!-- Local configuration for demo -->
-    <script type="application/json" id="bhw-local-config">
-    {
-        "title": "Age Verification",
-        "subtitle": "Adults Only",
-        "message": "You must be 18+ to view this content. Please verify your age.",
-        "yesButtonText": "I'm 18+",
-        "noButtonText": "I'm under 18",
-        "frequency": "session",
-        "triggers": {
-            "showOnLoad": false
-        },
-        "styling": {
-            "primaryColor": "#dc2626",
-            "secondaryColor": "#991b1b"
-        }
-    }
-    </script>
 </head>
 <body>
     <div class="demo-container">
@@ -131,7 +112,7 @@
 
     <script>
         function showWidget(clientId) {
-            const widget = window.BusinessHoursWidgets?.[clientId];
+            const widget = window.BusinessHoursWidgets?.ageVerification?.[clientId];
             if (widget) {
                 widget.show();
             } else {
@@ -140,10 +121,10 @@
         }
         
         function clearStorage() {
-            localStorage.removeItem('bhw-accepted-demo');
-            sessionStorage.removeItem('bhw-accepted-demo');
-            localStorage.removeItem('bhw-accepted-client123');
-            sessionStorage.removeItem('bhw-accepted-client123');
+            localStorage.removeItem('bhw-age-accepted-demo');
+            sessionStorage.removeItem('bhw-age-accepted-demo');
+            localStorage.removeItem('bhw-age-accepted-client123');
+            sessionStorage.removeItem('bhw-age-accepted-client123');
             alert('✅ Память всех виджетов очищена!');
         }
     </script>
