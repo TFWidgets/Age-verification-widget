@@ -47,7 +47,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: var(--bhw-overlay, radial-gradient(circle at 30% 20%, rgba(255,255,255,0.15) 0%, transparent 50%));
+            background: var(--bhw-overlay-inner, radial-gradient(circle at 30% 20%, rgba(255,255,255,0.15) 0%, transparent 50%));
             pointer-events: none;
         }
         
@@ -262,21 +262,21 @@
 
         // Создаем контейнер с уникальным классом
         const uniqueClass = `bhw-${clientId}-${Date.now()}`;
-        const container = createContainer(currentScript, clientId, uniqueClass);
+        const containerObj = createContainer(currentScript, clientId, uniqueClass);
         
         // Показываем загрузку
-        showLoading(container);
+        showLoading(containerObj);
 
         // Загружаем конфигурацию
         loadConfig(clientId, baseUrl)
             .then(config => {
-                applyCustomStyles(container, config, uniqueClass);
-                createBusinessHoursWidget(container, config, uniqueClass);
+                applyCustomStyles(containerObj, config, uniqueClass);
+                createBusinessHoursWidget(containerObj, config, uniqueClass, clientId);
                 console.log(`[BusinessHoursWidget] Виджет ${clientId} успешно создан`);
             })
             .catch(error => {
                 console.error('[BusinessHoursWidget] Ошибка:', error);
-                showError(container, clientId, error.message);
+                showError(containerObj, clientId, error.message);
             });
 
     } catch (error) {
@@ -342,57 +342,93 @@
     }
 
     function applyCustomStyles(containerObj, config, uniqueClass) {
-        const s = config.styling || {};
+        const s = config.style || {};
         
         const styleElement = document.createElement('style');
         styleElement.textContent = generateUniqueStyles(uniqueClass, s);
         containerObj.container.appendChild(styleElement);
     }
 
-    function generateUniqueStyles(uniqueClass, styling) {
-        const s = styling;
-        const background = s.primaryColor && s.secondaryColor ? 
-            `linear-gradient(135deg, ${s.primaryColor} 0%, ${s.secondaryColor} 100%)` : 
-            (s.backgroundColor || 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)');
+    function generateUniqueStyles(uniqueClass, style) {
+
+        const colors = style.colors || {};
+        const sizes = style.sizes || {};
+        const borderRadius = style.borderRadius || {};
+        const shadow = style.shadow || {};
+        const fs = sizes.fontSize || 1;
+
+        const background = colors.headerBackground || 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)';
 
         return `
             .${uniqueClass} {
-                font-family: ${s.fontFamily || 'inherit'};
+                font-family: ${style.fontFamily || 'inherit'};
             }
             
             .${uniqueClass} .bhw-widget {
                 background: ${background};
-                border-radius: ${s.borderRadius || '20px'};
-                padding: ${s.padding || '30px'};
-                color: ${s.textColor || 'white'};
-            }
-            
-            .${uniqueClass} .bhw-business-name {
-                font-size: ${s.businessNameSize || '1.8em'};
+                border-radius: ${borderRadius.widget || 20}px;
+                padding: ${sizes.padding || 32}px;
+                color: ${colors.text || 'white'};
+                box-shadow: ${shadow.widget || '0 25px 70px rgba(0,0,0,0.4)'};
             }
             
             .${uniqueClass} .bhw-overlay {
-                background: ${s.overlayColor || 'rgba(0,0,0,0.85)'};
+                background: ${colors.overlay || 'rgba(0,0,0,0.85)'};
+            }
+            
+            .${uniqueClass} .bhw-business-name {
+                font-size: ${1.8 * fs}em;
+            }
+            
+            .${uniqueClass} .bhw-hours-table {
+                background: ${colors.background || '#ffffff'};
+                color: ${colors.contentText || '#333'};
+            }
+            
+            .${uniqueClass} .bhw-hours-row {
+                color: ${colors.messageText || '#555'};
+            }
+            
+            .${uniqueClass} .bhw-hours-time.open {
+                background: ${colors.btnYes || 'linear-gradient(135deg, #10b981 0%, #059669 100%)'};
+                color: ${colors.btnYesText || 'white'};
+            }
+            
+            .${uniqueClass} .bhw-hours-time.open:hover {
+                box-shadow: ${shadow.btnYesHover || '0 8px 24px rgba(16, 185, 129, 0.4)'};
+            }
+            
+            .${uniqueClass} .bhw-hours-time.closed {
+                background: ${colors.btnNo || '#f1f5f9'};
+                color: ${colors.btnNoText || '#64748b'};
+            }
+            
+            .${uniqueClass} .bhw-hours-time.closed:hover {
+                background: ${colors.btnNoHover || '#e2e8f0'};
+            }
+            
+            .${uniqueClass} .bhw-closing-info {
+                color: ${colors.footerText || '#9ca3af'};
             }
             
             @media (max-width: 480px) {
                 .${uniqueClass} .bhw-widget {
-                    padding: ${s.paddingMobile || '20px'};
+                    padding: ${Math.round((sizes.padding || 32) * 0.8)}px;
                 }
                 .${uniqueClass} .bhw-business-name {
-                    font-size: ${s.nameSizeMobile || '1.6em'};
+                    font-size: ${1.6 * fs}em;
                 }
             }
         `;
     }
 
-    function createBusinessHoursWidget(containerObj, config, uniqueClass) {
+
+    function createBusinessHoursWidget(containerObj, config, uniqueClass, clientId) {
         const { overlay, container } = containerObj;
         
         // Безопасное отображение иконки
         const iconHtml = renderIcon(config);
 
-        // Блокируем контент если включена опция
         if (config.blockContent) {
             document.body.style.overflow = 'hidden';
         }
@@ -430,7 +466,7 @@
             overlay,
             container,
             config,
-            clientId,
+            clientId, 
             isShown: false,
             
             show() {
@@ -479,7 +515,7 @@
         // Обработчики событий
         setupEventHandlers(widget);
         
-        // Глобальный доступ к виджету
+        // Глобальный доступ к виджету (совместимость с вашим index.html)
         window.BusinessHoursWidgets = window.BusinessHoursWidgets || {};
         window.BusinessHoursWidgets[clientId] = widget;
         
@@ -593,5 +629,8 @@
                 </details>
             </div>
         `;
+        // Показываем ошибку
+        containerObj.overlay.style.display = 'flex';
+        setTimeout(() => containerObj.overlay.classList.add('show'), 10);
     }
 })();
