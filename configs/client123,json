@@ -1,16 +1,53 @@
 {
     "title": "Adults Only",
     "subtitle": "Alcohol Content",
-    "message": "You must be of legal drinking age in your country to enter this site.",
-    "footerText": "Please drink responsibly.",
+    "message": "You must be of legal drinking age in your country to enter this site. Please verify your age to continue.",
+    "footerText": "Please drink responsibly. Must be 21+ in the US.",
     "yesButtonText": "I am of legal age",
-    "noButtonText": "I am not",
+    "noButtonText": "I am not of age",
+    "iconHtml": "&#127866;",
+    "redirectUrl": "https://www.responsibility.org",
+    "blockContent": true,
     "frequency": "24h",
+    "triggers": {
+        "showOnLoad": false,
+        "showDelay": 0,
+        "showOnExit": false,
+        "showOnScroll": 0
+    },
     "style": {
+        "fontFamily": "'Roboto', sans-serif",
+        "valueFontFamily": "'JetBrains Mono', monospace",
         "colors": {
+            "background": "#fef7ed",
+            "overlay": "rgba(92, 41, 14, 0.9)",
             "headerBackground": "linear-gradient(135deg, #92400e 0%, #78350f 100%)",
-            "btnYes": "linear-gradient(135deg, #d97706 0%, #92400e 100%)"
+            "text": "#fef7ed",
+            "contentText": "#451a03",
+            "messageText": "#92400e",
+            "footerText": "#a16207",
+            "btnYes": "linear-gradient(135deg, #d97706 0%, #92400e 100%)",
+            "btnYesText": "white",
+            "btnNo": "#fed7aa",
+            "btnNoText": "#92400e",
+            "btnNoHover": "#fdba74"
+        },
+        "borderRadius": {
+            "widget": 18,
+            "buttons": 10
+        },
+        "sizes": {
+            "fontSize": 1.1,
+            "padding": 28,
+            "contentPadding": 28,
+            "footerPadding": 18,
+            "gap": 10,
+            "iconSize": 52
+        },
+        "shadow": {
+            "widget": "0 20px 60px rgba(146, 64, 14, 0.5)",
+            "text": "0 2px 6px rgba(120, 53, 15, 0.4)",
+            "btnYesHover": "0 6px 20px rgba(217, 119, 6, 0.5)"
         }
     }
 }
-
