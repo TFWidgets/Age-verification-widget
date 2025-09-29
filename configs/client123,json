@@ -1,1 +1,16 @@
+{
+    "title": "Adults Only",
+    "subtitle": "Alcohol Content",
+    "message": "You must be of legal drinking age in your country to enter this site.",
+    "footerText": "Please drink responsibly.",
+    "yesButtonText": "I am of legal age",
+    "noButtonText": "I am not",
+    "frequency": "24h",
+    "style": {
+        "colors": {
+            "headerBackground": "linear-gradient(135deg, #92400e 0%, #78350f 100%)",
+            "btnYes": "linear-gradient(135deg, #d97706 0%, #92400e 100%)"
+        }
+    }
+}
 
