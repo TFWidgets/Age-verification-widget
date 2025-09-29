@@ -1,6 +1,7 @@
 (function() {
     'use strict';
 
+    // Базовые CSS стили с унифицированными CSS-переменными
     const inlineCSS = `
         .bhw-age-overlay {
             position: fixed;
@@ -152,22 +153,6 @@
             border-top: 1px solid #f1f5f9;
         }
         
-        .bhw-age-loading {
-            text-align: center;
-            padding: var(--bhw-loading-padding, 40px);
-            color: var(--bhw-loading-color, #666);
-        }
-        
-        .bhw-age-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(220,38,38,0.2);
-            border-top: 3px solid #dc2626;
-            border-radius: 50%;
-            animation: bhw-age-spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-        
         @keyframes bhw-age-spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -195,6 +180,7 @@
         }
     `;
 
+    // Интеграция в общую экосистему BHW виджетов
     window.BusinessHoursWidgets = window.BusinessHoursWidgets || {};
     window.BusinessHoursWidgets.ageVerification = window.BusinessHoursWidgets.ageVerification || {};
 
@@ -218,6 +204,7 @@
 
         console.log(`[BusinessHoursAgeVerificationWidget] 🚀 Инициализация виджета "${clientId}"`);
 
+        // Уникальный ID стилей для age verification виджета
         if (!document.querySelector('#business-hours-age-verification-widget-styles')) {
             const style = document.createElement('style');
             style.id = 'business-hours-age-verification-widget-styles';
@@ -228,33 +215,26 @@
         const baseUrl = getBasePath(currentScript.src);
         const uniqueClass = `bhw-age-${clientId}-${Date.now()}`;
         
-        console.log(`[BusinessHoursAgeVerificationWidget] 📋 Загружаем конфиг для "${clientId}"`);
-
         // Загружаем конфигурацию
         loadConfig(clientId, baseUrl)
             .then(fetchedConfig => {
                 const finalConfig = mergeDeep(getDefaultConfig(), fetchedConfig);
-                console.log(`[BusinessHoursAgeVerificationWidget] 📋 Финальный конфиг для "${clientId}":`, finalConfig);
+                console.log(`[BusinessHoursAgeVerificationWidget] 📋 Конфиг для "${clientId}":`, finalConfig);
                 
                 const widget = createAgeVerificationWidget(finalConfig, uniqueClass, clientId);
                 window.BusinessHoursWidgets.ageVerification[clientId] = widget;
                 
-                // Показываем виджет согласно настройкам
-                if (shouldShowWidget(widget, finalConfig)) {
-                    setTimeout(() => widget.show(), finalConfig.showDelay || 500);
-                }
+                // Настройка триггеров (по умолчанию выключены для демо)
+                setupTriggers(widget, finalConfig.triggers || {});
                 
-                console.log(`[BusinessHoursAgeVerificationWidget] ✅ Виджет "${clientId}" успешно создан`);
+                console.log(`[BusinessHoursAgeVerificationWidget] ✅ Виджет "${clientId}" создан`);
             })
             .catch(error => {
-                console.warn(`[BusinessHoursAgeVerificationWidget] ⚠️ Ошибка загрузки "${clientId}":`, error.message);
+                console.warn(`[BusinessHoursAgeVerificationWidget] ⚠️ Используем дефолт для "${clientId}":`, error.message);
                 const defaultConfig = getDefaultConfig();
                 const widget = createAgeVerificationWidget(defaultConfig, uniqueClass, clientId);
                 window.BusinessHoursWidgets.ageVerification[clientId] = widget;
-                
-                if (shouldShowWidget(widget, defaultConfig)) {
-                    setTimeout(() => widget.show(), defaultConfig.showDelay || 500);
-                }
+                setupTriggers(widget, defaultConfig.triggers || {});
             });
 
     } catch (error) {
@@ -275,20 +255,25 @@
         }
     }
 
+    // Унифицированная структура конфига (1-в-1 для всех)
     function getDefaultConfig() {
         return {
             title: "Age Verification",
-            subtitle: "Restricted Content",
+            subtitle: "Restricted Content", 
             message: "You must be 18 or older to view this content. Please confirm your age to continue.",
             footerText: "By clicking 'Yes', you confirm that you are of legal age.",
             yesButtonText: "Yes, I'm 18+",
             noButtonText: "No, I'm under 18",
-            icon: "",
-            iconHtml: "&#128286;", // 🔞 как HTML entity
-            showDelay: 500,
-            frequency: "30d", // 'always' | 'session' | '24h' | '30d'
+            iconHtml: "&#128286;",
             redirectUrl: "https://www.google.com",
             blockContent: true,
+            frequency: "30d",
+            triggers: {
+                showOnLoad: false,    // Для демо выключено
+                showDelay: 0,
+                showOnExit: false,
+                showOnScroll: 0       // Процент прокрутки (0 = выключено)
+            },
             style: {
                 fontFamily: "'Inter', system-ui, sans-serif",
                 valueFontFamily: "'Inter', system-ui, sans-serif",
@@ -331,7 +316,7 @@
         const result = { ...base, ...override };
 
         // Сливаем объекты первого уровня
-        for (const key of ['style']) {
+        for (const key of ['style', 'triggers']) {
             if (base[key] && typeof base[key] === 'object' && !Array.isArray(base[key])) {
                 result[key] = { ...(base[key] || {}), ...(override[key] || {}) };
             }
@@ -358,7 +343,7 @@
             }
             try {
                 const config = JSON.parse(localScript.textContent);
-                console.log(`[BusinessHoursAgeVerificationWidget] 📄 Локальный конфиг загружен:`, config);
+                console.log(`[BusinessHoursAgeVerificationWidget] 📄 Локальный конфиг загружен`);
                 return config;
             } catch (err) {
                 throw new Error('Ошибка парсинга локального JSON: ' + err.message);
@@ -367,7 +352,7 @@
 
         // Загрузка с сервера
         const configUrl = `${baseUrl}configs/${encodeURIComponent(clientId)}.json?v=${Date.now()}`;
-        console.log(`[BusinessHoursAgeVerificationWidget] 🌐 Загружаем конфиг: ${configUrl}`);
+        console.log(`[BusinessHoursAgeVerificationWidget] 🌐 Загружаем: ${configUrl}`);
         
         const response = await fetch(configUrl, { 
             cache: 'no-store',
@@ -378,9 +363,7 @@
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
-        const config = await response.json();
-        console.log(`[BusinessHoursAgeVerificationWidget] ✅ Серверный конфиг загружен:`, config);
-        return config;
+        return await response.json();
     }
 
     function createAgeVerificationWidget(config, uniqueClass, id) {
@@ -395,17 +378,12 @@
         // Безопасное отображение иконки
         const iconHtml = renderIcon(config);
 
-        // Блокируем контент если включена опция
-        if (config.blockContent) {
-            document.body.style.overflow = 'hidden';
-        }
-
         // HTML структура
         overlay.innerHTML = `
-            <div class="bhw-age-card" role="dialog" aria-modal="true" aria-labelledby="age-title">
+            <div class="bhw-age-card" role="dialog" aria-modal="true">
                 <div class="bhw-age-header">
                     <div class="bhw-age-icon">${iconHtml}</div>
-                    <h2 class="bhw-age-title" id="age-title">${escapeHtml(config.title)}</h2>
+                    <h2 class="bhw-age-title">${escapeHtml(config.title)}</h2>
                     <p class="bhw-age-subtitle">${escapeHtml(config.subtitle)}</p>
                 </div>
                 
@@ -413,10 +391,10 @@
                     <p class="bhw-age-message">${escapeHtml(config.message)}</p>
                     
                     <div class="bhw-age-buttons">
-                        <button class="bhw-age-btn bhw-age-btn-yes" type="button" aria-label="Confirm age">
+                        <button class="bhw-age-btn bhw-age-btn-yes" type="button">
                             ${escapeHtml(config.yesButtonText)}
                         </button>
-                        <button class="bhw-age-btn bhw-age-btn-no" type="button" aria-label="Decline verification">
+                        <button class="bhw-age-btn bhw-age-btn-no" type="button">
                             ${escapeHtml(config.noButtonText)}
                         </button>
                     </div>
@@ -437,11 +415,15 @@
             isShown: false,
             
             show() {
-                if (this.isShown) return;
+                if (this.isShown || !shouldShowByFrequency(this.config.frequency, this.id)) return;
                 
                 this.overlay.style.display = 'flex';
                 setTimeout(() => this.overlay.classList.add('show'), 10);
                 this.overlay.setAttribute('aria-hidden', 'false');
+                
+                if (this.config.blockContent) {
+                    document.body.style.overflow = 'hidden';
+                }
                 
                 this.isShown = true;
             },
@@ -545,29 +527,8 @@
                 --bhw-btn-no-bg: ${colors.btnNo || "#f1f5f9"};
                 --bhw-btn-no-color: ${colors.btnNoText || "#64748b"};
                 --bhw-btn-no-bg-hover: ${colors.btnNoHover || "#e2e8f0"};
-                --bhw-loading-padding: 40px;
-                --bhw-loading-color: #666;
             }
         `;
-    }
-
-    function renderIcon(config) {
-        // Приоритет: iconHtml > icon > дефолт
-        if (config.iconHtml && config.iconHtml.trim()) {
-            // Если это HTML entity или простой HTML - вставляем как есть
-            if (config.iconHtml.includes('&') || config.iconHtml.includes('<')) {
-                return config.iconHtml;
-            }
-            // Если это эмодзи - экранируем
-            return escapeHtml(config.iconHtml);
-        }
-        
-        if (config.icon && config.icon.trim()) {
-            return escapeHtml(config.icon);
-        }
-        
-        // Дефолтная иконка
-        return '&#128286;'; // 🔞
     }
 
     function setupEventHandlers(widget) {
@@ -582,24 +543,42 @@
         overlay.querySelector('.bhw-age-btn-no').addEventListener('click', () => {
             widget.decline();
         });
-        
-        // Блокируем закрытие по Escape и клику на оверлей для обязательной верификации
-        // Если нужно разрешить закрытие, раскомментируйте:
-        /*
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) widget.decline();
-        });
-        
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && widget.isShown) {
-                widget.decline();
-            }
-        });
-        */
     }
 
-    function shouldShowWidget(widget, config) {
-        return shouldShowByFrequency(config.frequency, widget.id);
+    // Система триггеров
+    function setupTriggers(widget, triggers) {
+        // Проверяем частоту показа
+        if (!shouldShowByFrequency(widget.config.frequency, widget.id)) return;
+
+        // Автопоказ при загрузке
+        if (triggers.showOnLoad) {
+            const delay = Math.max(0, Number(triggers.showDelay || 0));
+            setTimeout(() => widget.show(), delay);
+        }
+
+        // Exit-intent триггер
+        if (triggers.showOnExit) {
+            let hasTriggered = false;
+            document.addEventListener('mouseleave', (e) => {
+                if (e.clientY <= 0 && !hasTriggered && !widget.isShown) {
+                    widget.show();
+                    hasTriggered = true;
+                }
+            });
+        }
+
+        // Триггер по скроллу
+        if (triggers.showOnScroll > 0) {
+            let hasTriggered = false;
+            window.addEventListener('scroll', () => {
+                const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+                
+                if (scrollPercent >= triggers.showOnScroll && !hasTriggered && !widget.isShown) {
+                    widget.show();
+                    hasTriggered = true;
+                }
+            });
+        }
     }
 
     function shouldShowByFrequency(frequency, id) {
@@ -613,6 +592,7 @@
         const now = Date.now();
         const intervals = { 
             '24h': 24 * 60 * 60 * 1000, 
+            '7d': 7 * 24 * 60 * 60 * 1000,
             '30d': 30 * 24 * 60 * 60 * 1000 
         };
         
@@ -627,10 +607,19 @@
         }
     }
 
+    function renderIcon(config) {
+        if (config.iconHtml && config.iconHtml.trim()) {
+            if (config.iconHtml.includes('&') || config.iconHtml.includes('<')) {
+                return config.iconHtml;
+            }
+            return escapeHtml(config.iconHtml);
+        }
+        return '&#128286;'; // 🔞
+    }
+
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text || '';
         return div.innerHTML;
     }
 })();
-
