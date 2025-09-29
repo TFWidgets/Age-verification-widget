@@ -1,1 +1,23 @@
+{
+    "title": "Age Verification Required",
+    "subtitle": "18+ Content Warning",
+    "message": "This website contains age-restricted content. You must be 18 years or older to proceed. Please confirm your age to continue browsing.",
+    "footerText": "By clicking 'Yes', you confirm that you are of legal age in your jurisdiction.",
+    "yesButtonText": "Yes, I'm 18 or older",
+    "noButtonText": "No, take me away",
+    "iconHtml": "&#128286;",
+    "showDelay": 1000,
+    "frequency": "7d",
+    "redirectUrl": "https://www.google.com",
+    "blockContent": true,
+    "style": {
+        "colors": {
+            "headerBackground": "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)",
+            "btnYes": "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+        },
+        "sizes": {
+            "fontSize": 1.0
+        }
+    }
+}
 
