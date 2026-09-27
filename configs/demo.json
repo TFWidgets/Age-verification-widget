@@ -1,53 +1,42 @@
 {
-    "title": "Age Verification Required",
-    "subtitle": "18+ Content Warning",
-    "message": "This website contains age-restricted content. You must be 18 years or older to proceed. Please confirm your age to continue browsing.",
-    "footerText": "By clicking 'Yes', you confirm that you are of legal age in your jurisdiction.",
-    "yesButtonText": "Yes, I'm 18 or older",
-    "noButtonText": "No, take me away",
-    "iconHtml": "&#128286;",
-    "redirectUrl": "https://www.google.com",
-    "blockContent": true,
-    "frequency": "session",
-    "triggers": {
-        "showOnLoad": false,
-        "showDelay": 0,
-        "showOnExit": false,
-        "showOnScroll": 0
+  "active": true,
+  "domains": ["tf-widgets.com", "*.tf-widgets.com"],
+  "mode": "confirm",
+  "minAge": 18,
+  "layout": "minimal",
+  "title": "Are you over 18?",
+  "subtitle": "Age verification",
+  "message": "This website contains age-restricted products. Please confirm your age to continue.",
+  "yesButtonText": "Yes, I am 18 or older",
+  "noButtonText": "No, leave the site",
+  "deniedTitle": "Sorry, you can't enter",
+  "deniedMessage": "You must be of legal age to view this website.",
+  "footerText": "By entering this site you confirm that you are of legal age in your country.",
+  "redirectUrl": "",
+  "blockContent": true,
+  "frequency": "30d",
+  "triggers": { "showOnLoad": true, "showDelay": 0 },
+  "style": {
+    "fontFamily": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif",
+    "overlayBlur": 14,
+    "colors": {
+      "background": "#111214",
+      "overlay": "rgba(8, 8, 10, 0.72)",
+      "headerBackground": "transparent",
+      "text": "#ffffff",
+      "contentText": "#f5f5f5",
+      "messageText": "rgba(255, 255, 255, 0.66)",
+      "footerText": "rgba(255, 255, 255, 0.42)",
+      "accent": "#d6b36a",
+      "border": "rgba(255, 255, 255, 0.08)",
+      "btnYes": "#d6b36a",
+      "btnYesText": "#1a1407",
+      "btnNo": "transparent",
+      "btnNoText": "rgba(255, 255, 255, 0.6)",
+      "btnNoHover": "rgba(255, 255, 255, 0.06)"
     },
-    "style": {
-        "fontFamily": "'Inter', system-ui, sans-serif",
-        "valueFontFamily": "'Inter', system-ui, sans-serif",
-        "colors": {
-            "background": "#ffffff",
-            "overlay": "rgba(0,0,0,0.85)",
-            "headerBackground": "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)",
-            "text": "white",
-            "contentText": "#333333",
-            "messageText": "#555555",
-            "footerText": "#9ca3af",
-            "btnYes": "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-            "btnYesText": "white",
-            "btnNo": "#f1f5f9",
-            "btnNoText": "#64748b",
-            "btnNoHover": "#e2e8f0"
-        },
-        "borderRadius": {
-            "widget": 20,
-            "buttons": 12
-        },
-        "sizes": {
-            "fontSize": 1.0,
-            "padding": 32,
-            "contentPadding": 32,
-            "footerPadding": 20,
-            "gap": 12,
-            "iconSize": 56
-        },
-        "shadow": {
-            "widget": "0 25px 70px rgba(0,0,0,0.4)",
-            "text": "0 2px 8px rgba(0,0,0,0.3)",
-            "btnYesHover": "0 8px 24px rgba(16, 185, 129, 0.4)"
-        }
-    }
+    "borderRadius": { "widget": 22, "buttons": 14 },
+    "sizes": { "fontSize": 1, "width": 420 },
+    "shadow": { "widget": "0 30px 80px -20px rgba(0, 0, 0, 0.6)", "btnYesHover": "0 10px 26px -8px rgba(214, 179, 106, 0.55)" }
+  }
 }
