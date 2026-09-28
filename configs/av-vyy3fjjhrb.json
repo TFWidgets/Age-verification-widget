@@ -1,0 +1,64 @@
+{
+  "active": true,
+  "domains": [
+    "mxtoolbox.com"
+  ],
+  "widget": "age",
+  "order": "#1012",
+  "site": "s6xhaqsx9",
+  "mode": "confirm",
+  "minAge": 21,
+  "layout": "minimal",
+  "dateOrder": "DMY",
+  "logoUrl": "",
+  "iconHtml": "",
+  "title": "Are you over {age}?",
+  "subtitle": "Age verification",
+  "message": "This website sells age-restricted products. Please confirm you are {age} or older to continue.",
+  "yesButtonText": "Yes, I am {age} or older",
+  "noButtonText": "No, leave the site",
+  "dobLabel": "Enter your date of birth",
+  "continueButtonText": "Enter site",
+  "deniedTitle": "Sorry, you can't enter",
+  "deniedMessage": "You must be {age} or older to view this website.",
+  "footerText": "By entering this site you confirm that you are of legal age in your country.",
+  "redirectUrl": "",
+  "blockContent": true,
+  "frequency": "30d",
+  "triggers": {
+    "showOnLoad": true,
+    "showDelay": 0
+  },
+  "style": {
+    "fontFamily": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif",
+    "overlayBlur": 14,
+    "colors": {
+      "background": "#fbf5ec",
+      "overlay": "rgba(8, 8, 10, 0.72)",
+      "headerBackground": "transparent",
+      "text": "#3b2412",
+      "contentText": "#3b2412",
+      "messageText": "rgba(59, 36, 18, 0.68)",
+      "footerText": "rgba(59, 36, 18, 0.46)",
+      "accent": "#b45309",
+      "border": "rgba(59, 36, 18, 0.08)",
+      "btnYes": "#b45309",
+      "btnYesText": "#ffffff",
+      "btnNo": "transparent",
+      "btnNoText": "rgba(59, 36, 18, 0.62)",
+      "btnNoHover": "rgba(59, 36, 18, 0.06)"
+    },
+    "borderRadius": {
+      "widget": 22,
+      "buttons": 14
+    },
+    "sizes": {
+      "fontSize": 1,
+      "width": 420
+    },
+    "shadow": {
+      "widget": "0 30px 80px -20px rgba(0, 0, 0, 0.6)",
+      "btnYesHover": "0 10px 26px -8px rgba(180, 83, 9, 0.55)"
+    }
+  }
+}
